@@ -1,7 +1,8 @@
 from django.urls import path
-from .views import ApplicationView, ApplicationRetrieveView
+from .views import ApplicationView, ApplicationRetrieveView, StatusRetrivePathView
 
 urlpatterns = [
     path('', ApplicationView.as_view(), name = 'application'),
-    path('<int:pk>/', ApplicationRetrieveView.as_view(), name = 'retrieve_application')
+    path('<int:pk>/', ApplicationRetrieveView.as_view(), name = 'retrieve_application'),
+    path('checklist/<int:pk>/', StatusRetrivePathView.as_view(), name = 'status')
 ]
