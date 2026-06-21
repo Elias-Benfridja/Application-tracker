@@ -45,6 +45,10 @@ function ApplicationDetail() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [openIds, setOpenIds] = useState<Set<number>>(new Set())
+  const [showChat, setShowChat] = useState(false)
+  const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'assistant'; text: string }[]>([])
+  const [chatInput, setChatInput] = useState('')
+  const [chatLoading, setChatLoading] = useState(false)
 
   useEffect(() => {
     const fetchApplication = async () => {
@@ -93,6 +97,22 @@ function ApplicationDetail() {
         ),
       })
       setError('Could not update status, please try again')
+    }
+  }
+
+  const handleSendMessage = async () => {
+    if (!chatInput.trim() || !application) return
+    const question = chatInput
+    setChatMessages((prev) => [...prev, { role: 'user', text: question }])
+    setChatInput('')
+    setChatLoading(true)
+    try {
+      const response = await api.post(`/application/${application.id}/chat/`, { question })
+      setChatMessages((prev) => [...prev, { role: 'assistant', text: response.data.answer }])
+    } catch {
+      setChatMessages((prev) => [...prev, { role: 'assistant', text: 'Sorry, I could not process that question.' }])
+    } finally {
+      setChatLoading(false)
     }
   }
 
@@ -234,7 +254,10 @@ function ApplicationDetail() {
                 Our immigration experts are ready to review your documents to ensure 100% compliance.
               </p>
               <div className="flex flex-col gap-stack-sm">
-                <button className="flex items-center justify-center gap-base px-4 py-2 border border-primary text-primary rounded-lg font-medium hover:bg-primary hover:text-white transition-all">
+                <button
+                  className="flex items-center justify-center gap-base px-4 py-2 border border-primary text-primary rounded-lg font-medium hover:bg-primary hover:text-white transition-all"
+                  onClick={() => setShowChat(true)}
+                >
                   <span className="material-symbols-outlined text-[20px]">chat</span>
                   Chat with Advisor
                 </button>
@@ -263,6 +286,75 @@ function ApplicationDetail() {
           <p className="font-body-sm text-body-sm text-on-surface-variant">© 2024 VisaTrack. All rights reserved.</p>
         </div>
       </footer>
+
+      {/* Chat with Advisor Panel */}
+      {showChat && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-100 flex items-end md:items-center justify-center md:justify-end"
+          onClick={(e) => e.target === e.currentTarget && setShowChat(false)}
+        >
+          <div className="bg-surface-container-lowest w-full md:w-100 md:h-full max-h-[80vh] md:max-h-full rounded-t-xl md:rounded-none shadow-2xl flex flex-col">
+            {/* Chat Header */}
+            <div className="p-4 border-b border-outline-variant flex justify-between items-center bg-primary-container">
+              <div className="flex items-center gap-stack-sm">
+                <span className="material-symbols-outlined text-white">support_agent</span>
+                <h2 className="font-headline-md text-headline-md text-white">Visa Advisor</h2>
+              </div>
+              <button className="text-white hover:opacity-70" onClick={() => setShowChat(false)}>
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-stack-sm">
+              {chatMessages.length === 0 && (
+                <p className="text-on-surface-variant font-body-sm text-center mt-stack-lg">
+                  Ask anything about your {application.country} {application.purpose} application.
+                </p>
+              )}
+              {chatMessages.map((msg, i) => (
+                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div
+                    className={`max-w-[80%] px-4 py-2 rounded-lg font-body-sm text-body-sm ${
+                      msg.role === 'user'
+                        ? 'bg-primary text-white rounded-br-none'
+                        : 'bg-surface-container text-on-surface rounded-bl-none'
+                    }`}
+                  >
+                    {msg.text}
+                  </div>
+                </div>
+              ))}
+              {chatLoading && (
+                <div className="flex justify-start">
+                  <div className="bg-surface-container text-on-surface-variant px-4 py-2 rounded-lg font-body-sm text-body-sm rounded-bl-none">
+                    Thinking...
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Input */}
+            <div className="p-4 border-t border-outline-variant flex gap-2">
+              <input
+                className="flex-1 px-4 py-2 border border-outline-variant rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary/10 focus:border-secondary font-body-sm bg-surface"
+                placeholder="Ask a question..."
+                type="text"
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && !chatLoading && handleSendMessage()}
+              />
+              <button
+                className="px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90 disabled:opacity-50"
+                onClick={handleSendMessage}
+                disabled={chatLoading}
+              >
+                <span className="material-symbols-outlined text-[20px]">send</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

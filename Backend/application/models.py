@@ -23,3 +23,4 @@ class ApplicationDocumentation(models.Model):
     document = models.ForeignKey(Document, on_delete=models.CASCADE)
     application = models.ForeignKey(Application, on_delete=models.CASCADE)
     status = models.CharField(choices=Status.choices, max_length=1, default=Status.TO_DO)
+    

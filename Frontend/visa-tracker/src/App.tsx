@@ -3,6 +3,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ApplicationDetail from "./pages/ApplicationDetail";
+import Deadlines from "./pages/Deadlines";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -27,6 +28,12 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/deadlines" 
+        element={
+          <ProtectedRoute>
+            <Deadlines />
+          </ProtectedRoute>
+        } />
       </Routes>
     </BrowserRouter>
   );

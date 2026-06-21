@@ -1,8 +1,10 @@
 from rest_framework.generics import ListCreateAPIView, RetrieveAPIView, RetrieveUpdateAPIView
+from rest_framework.views import APIView, Response
 from .serializers import ApplicationSerializer, ChecklistSerializer
 from .models import Application, Document, ApplicationDocumentation
 from rest_framework.permissions import IsAuthenticated
-from .services import generate_document_checklist
+from .services import generate_document_checklist, get_advisor_answer
+from django.shortcuts import get_object_or_404
 # Create your views here.
 
 class ApplicationView(ListCreateAPIView):
@@ -41,3 +43,13 @@ class StatusRetrivePathView(RetrieveUpdateAPIView):
     def get_queryset(self):
         return ApplicationDocumentation.objects.filter(application__user = self.request.user)
     
+class ChatAdvisorView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, pk):
+        application = get_object_or_404(Application, user = self.request.user, pk = pk)
+        response = get_advisor_answer(application,request.data["question"])
+        return Response({"answer": response})
+            
+            
+            
