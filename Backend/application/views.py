@@ -3,7 +3,7 @@ from rest_framework.views import APIView, Response
 from .serializers import ApplicationSerializer, ChecklistSerializer
 from .models import Application, Document, ApplicationDocumentation
 from rest_framework.permissions import IsAuthenticated
-from .services import generate_document_checklist, get_advisor_answer
+from .services import generate_document_checklist, get_advisor_answer, get_guide_answer
 from django.shortcuts import get_object_or_404
 # Create your views here.
 
@@ -51,5 +51,13 @@ class ChatAdvisorView(APIView):
         response = get_advisor_answer(application,request.data["question"])
         return Response({"answer": response})
             
+            
+class GuideView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, pk):
+        application = get_object_or_404(Application, user = self.request.user, pk = pk)
+        response = get_guide_answer(application.country, application.purpose)
+        return Response({"guide": response})
             
             

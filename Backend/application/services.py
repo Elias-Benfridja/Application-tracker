@@ -46,6 +46,23 @@ Instructions:
 - Write in plain text, no markdown formatting.
 """
 
+def build_guide_prompt(country: str, purpose: str) -> str:
+    return f"""
+You are a knowledgeable visa and immigration advisor writing a guide for someone applying for {purpose} in {country}.
+
+Write a clear, practical guide covering:
+1. A brief overview of the application process and typical timeline
+2. The most common mistakes or pitfalls applicants face for this specific visa type and country
+3. Practical tips that genuinely improve someone's chances of a smooth approval
+
+Instructions:
+- Write in plain text only, no markdown formatting (no asterisks, no headers, no bullet symbols).
+- Separate each of the three sections with a blank line so they read as distinct paragraphs.
+- Keep the entire guide between 150-250 words — informative but skimmable, not exhaustive.
+- Be specific to {country} and {purpose} where possible, rather than generic advice that could apply to any visa.
+- Write in a warm, encouraging tone, as if guiding a friend through an unfamiliar process.
+"""
+
 
 def generate_document_checklist(country: str, purpose: str) -> list:
     prompt = build_prompt(country,purpose)
@@ -74,6 +91,18 @@ def get_advisor_answer(application: Application, question: str) -> str:
         documents.append(item.document.name)
     prompt = build_chat_prompt(question, country, purpose, documents)
     
+    try:
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt
+        )
+    except Exception as e:
+        raise Exception(f"Gemini API error: {str(e)}")
+
+    return response.text
+
+def get_guide_answer(country: str, purpose: str) -> str:
+    prompt = build_guide_prompt(country, purpose)
     try:
         response = client.models.generate_content(
             model='gemini-2.5-flash',

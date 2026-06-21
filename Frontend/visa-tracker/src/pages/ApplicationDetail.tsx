@@ -49,6 +49,10 @@ function ApplicationDetail() {
   const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'assistant'; text: string }[]>([])
   const [chatInput, setChatInput] = useState('')
   const [chatLoading, setChatLoading] = useState(false)
+  const [showGuide, setShowGuide] = useState(false)
+  const [guideText, setGuideText] = useState('')
+  const [guideLoading, setGuideLoading] = useState(false)
+  const [guideError, setGuideError] = useState('')
 
   useEffect(() => {
     const fetchApplication = async () => {
@@ -74,9 +78,8 @@ function ApplicationDetail() {
     })
   }
 
-  const handleStatusClick = async (item: ChecklistItem) => {
+  const updateStatus = async (item: ChecklistItem, newStatus: string) => {
     if (!application) return
-    const newStatus = nextStatus(item.status)
 
     // optimistic update
     setApplication({
@@ -100,6 +103,16 @@ function ApplicationDetail() {
     }
   }
 
+  const handleCheckboxClick = (item: ChecklistItem) => {
+    // single click toggles directly between Done and To Do
+    updateStatus(item, item.status === 'D' ? 'T' : 'D')
+  }
+
+  const handleBadgeClick = (item: ChecklistItem) => {
+    // badge keeps the full 3-way cycle for finer control
+    updateStatus(item, nextStatus(item.status))
+  }
+
   const handleSendMessage = async () => {
     if (!chatInput.trim() || !application) return
     const question = chatInput
@@ -113,6 +126,21 @@ function ApplicationDetail() {
       setChatMessages((prev) => [...prev, { role: 'assistant', text: 'Sorry, I could not process that question.' }])
     } finally {
       setChatLoading(false)
+    }
+  }
+
+  const handleOpenGuide = async () => {
+    setShowGuide(true)
+    if (guideText) return // already fetched once, no need to call again
+    setGuideLoading(true)
+    setGuideError('')
+    try {
+      const response = await api.get(`/application/${application?.id}/guide/`)
+      setGuideText(response.data.guide)
+    } catch {
+      setGuideError('Could not load the guide right now, please try again.')
+    } finally {
+      setGuideLoading(false)
     }
   }
 
@@ -204,7 +232,7 @@ function ApplicationDetail() {
                 >
                   <div className="flex justify-between items-start mb-stack-sm">
                     <div className="flex items-start gap-stack-sm">
-                      <button className="mt-1" onClick={() => handleStatusClick(item)} title="Click to update status">
+                      <button className="mt-1" onClick={() => handleCheckboxClick(item)} title="Mark as done / not done">
                         <input
                           checked={isDone}
                           readOnly
@@ -222,7 +250,8 @@ function ApplicationDetail() {
                     <button
                       className="px-3 py-1 rounded-full font-status-label text-status-label whitespace-nowrap"
                       style={{ backgroundColor: config.bg, color: config.color }}
-                      onClick={() => handleStatusClick(item)}
+                      onClick={() => handleBadgeClick(item)}
+                      title="Click to cycle status"
                     >
                       {config.label}
                     </button>
@@ -261,7 +290,10 @@ function ApplicationDetail() {
                   <span className="material-symbols-outlined text-[20px]">chat</span>
                   Chat with Advisor
                 </button>
-                <button className="flex items-center justify-center gap-base px-4 py-2 border border-primary text-primary rounded-lg font-medium hover:bg-primary hover:text-white transition-all">
+                <button
+                  className="flex items-center justify-center gap-base px-4 py-2 border border-primary text-primary rounded-lg font-medium hover:bg-primary hover:text-white transition-all"
+                  onClick={handleOpenGuide}
+                >
                   <span className="material-symbols-outlined text-[20px]">article</span>
                   Browse Visa Guide
                 </button>
@@ -351,6 +383,41 @@ function ApplicationDetail() {
               >
                 <span className="material-symbols-outlined text-[20px]">send</span>
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Visa Guide Modal */}
+      {showGuide && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-100 flex items-center justify-center p-gutter"
+          onClick={(e) => e.target === e.currentTarget && setShowGuide(false)}
+        >
+          <div className="bg-surface-container-lowest w-full max-w-lg rounded-xl shadow-2xl max-h-[80vh] flex flex-col">
+            <div className="p-6 border-b border-outline-variant flex justify-between items-center">
+              <div className="flex items-center gap-stack-sm">
+                <span className="material-symbols-outlined text-secondary">article</span>
+                <h2 className="font-headline-md text-headline-md text-primary">
+                  {application.country} {application.purpose} Guide
+                </h2>
+              </div>
+              <button className="text-on-surface-variant hover:text-primary" onClick={() => setShowGuide(false)}>
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto space-y-stack-md">
+              {guideLoading && (
+                <p className="text-on-surface-variant font-body-sm text-center">Generating your guide...</p>
+              )}
+              {guideError && <p className="text-error font-body-sm text-center">{guideError}</p>}
+              {!guideLoading &&
+                !guideError &&
+                guideText.split('\n\n').map((paragraph, i) => (
+                  <p key={i} className="font-body-lg text-body-lg text-on-surface-variant">
+                    {paragraph}
+                  </p>
+                ))}
             </div>
           </div>
         </div>
