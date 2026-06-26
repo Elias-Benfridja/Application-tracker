@@ -4,6 +4,8 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ApplicationDetail from "./pages/ApplicationDetail";
 import Deadlines from "./pages/Deadlines";
+import Community from "./pages/Community";
+import CommunityQuestion from "./pages/CommunityQuestion";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -34,6 +36,22 @@ function App() {
             <Deadlines />
           </ProtectedRoute>
         } />
+        <Route
+          path="/community"
+          element={
+            <ProtectedRoute>
+              <Community />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/community/:id"
+          element={
+            <ProtectedRoute>
+              <CommunityQuestion />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

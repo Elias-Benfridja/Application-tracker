@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import api from "../api/axios";
+import { useProfile } from "../hooks/useProfile";
+import UpgradeModal from "../components/UpgradeModal";
 
 interface DocumentItem {
   name: string;
@@ -59,6 +61,8 @@ function Dashboard() {
   const [deadline, setDeadline] = useState("");
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
+  const { profile, atFreeLimit, upgrading, fetchProfile, upgrade } = useProfile();
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const fetchApplications = async () => {
     setLoading(true);
@@ -82,6 +86,14 @@ function Dashboard() {
     navigate("/login");
   };
 
+  const openCreateModal = () => {
+    if (atFreeLimit) {
+      setShowUpgradeModal(true);
+      return;
+    }
+    setShowModal(true);
+  };
+
   const handleCreate = async () => {
     if (!country || !deadline) {
       setError("Please fill in all fields");
@@ -98,11 +110,21 @@ function Dashboard() {
       setShowModal(false);
       setCountry("");
       setDeadline("");
+      fetchProfile();
       navigate(`/application/${response.data.id}`);
     } catch {
       setError("Could not create application. Please try again.");
     } finally {
       setCreating(false);
+    }
+  };
+
+  const handleUpgrade = async () => {
+    const success = await upgrade();
+    if (success) {
+      setShowUpgradeModal(false);
+    } else {
+      setError("Could not upgrade right now. Please try again.");
     }
   };
 
@@ -127,9 +149,12 @@ function Dashboard() {
             >
               Deadlines
             </Link>
-            <span className="text-on-surface-variant font-medium font-body-lg">
-              Support
-            </span>
+            <Link
+              to="/community"
+              className="text-on-surface-variant font-medium hover:text-primary transition-colors font-body-lg"
+            >
+              Community
+            </Link>
           </div>
           <div className="flex items-center gap-stack-md">
             <button
@@ -138,9 +163,18 @@ function Dashboard() {
             >
               Logout
             </button>
+            {profile && !profile.isPro && (
+              <button
+                className="border border-primary text-primary px-4 py-2 rounded-lg font-medium hover:bg-primary hover:text-white transition-all flex items-center gap-2"
+                onClick={() => setShowUpgradeModal(true)}
+              >
+                <span className="material-symbols-outlined text-[20px]">workspace_premium</span>
+                Upgrade
+              </button>
+            )}
             <button
               className="bg-primary text-on-primary px-4 py-2 rounded-lg font-medium hover:opacity-90 transition-all flex items-center gap-2 text-white"
-              onClick={() => setShowModal(true)}
+              onClick={openCreateModal}
             >
               <span className="material-symbols-outlined text-[20px]">add</span>
               New Visa
@@ -251,7 +285,7 @@ function Dashboard() {
             {/* Add New Placeholder */}
             <button
               className="border-2 border-dashed border-outline-variant rounded-lg flex flex-col items-center justify-center p-8 hover:bg-surface-container transition-colors min-h-65"
-              onClick={() => setShowModal(true)}
+              onClick={openCreateModal}
             >
               <div className="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center mb-4">
                 <span className="material-symbols-outlined text-primary text-[32px]">
@@ -399,6 +433,14 @@ function Dashboard() {
           </div>
         </div>
       )}
+
+      <UpgradeModal
+        open={showUpgradeModal}
+        reason="You've reached the 1-application limit on the Free plan."
+        upgrading={upgrading}
+        onClose={() => setShowUpgradeModal(false)}
+        onUpgrade={handleUpgrade}
+      />
     </div>
   );
 }

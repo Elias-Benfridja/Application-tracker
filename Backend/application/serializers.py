@@ -10,7 +10,7 @@ class ApplicationDocumentationSerializer(serializers.ModelSerializer):
     document = DocumentSerializer(read_only=True)
     class Meta:
         model = ApplicationDocumentation
-        fields = ["id", "document", "status"]
+        fields = ["id", "document", "status", "attachment"]
         
 class ApplicationSerializer(serializers.ModelSerializer):
     checklist = ApplicationDocumentationSerializer(many=True, read_only=True, source='applicationdocumentation_set')
@@ -21,4 +21,4 @@ class ApplicationSerializer(serializers.ModelSerializer):
 class ChecklistSerializer(serializers.ModelSerializer):
     class Meta:
         model = ApplicationDocumentation
-        fields = ["status"]
+        fields = ["status", "attachment"]

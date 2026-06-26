@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import FileExtensionValidator
 
 # Create your models here.
 
@@ -23,4 +24,10 @@ class ApplicationDocumentation(models.Model):
     document = models.ForeignKey(Document, on_delete=models.CASCADE)
     application = models.ForeignKey(Application, on_delete=models.CASCADE)
     status = models.CharField(choices=Status.choices, max_length=1, default=Status.TO_DO)
+    attachment = models.FileField(
+        upload_to='documents/',
+        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'png', 'jpg', 'jpeg'])],
+        null=True,
+        blank=True
+    )
     

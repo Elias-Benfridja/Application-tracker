@@ -108,7 +108,12 @@ function Deadlines() {
             </a>
             <span className="text-on-surface-variant font-medium">Documents</span>
             <a className="text-primary font-bold border-b-2 border-primary pb-1 cursor-pointer">Deadlines</a>
-            <span className="text-on-surface-variant font-medium">Support</span>
+            <a
+              className="text-on-surface-variant font-medium hover:text-primary transition-colors cursor-pointer"
+              onClick={() => navigate('/community')}
+            >
+              Community
+            </a>
           </div>
           <div className="flex items-center gap-4">
             <button

@@ -5,7 +5,10 @@ from .models import Application, Document, ApplicationDocumentation
 from rest_framework.permissions import IsAuthenticated
 from .services import generate_document_checklist, get_advisor_answer, get_guide_answer
 from django.shortcuts import get_object_or_404
+from rest_framework.exceptions import PermissionDenied
 # Create your views here.
+
+FREE_TIER_APP_LIMIT = 1
 
 class ApplicationView(ListCreateAPIView):
     serializer_class = ApplicationSerializer
@@ -14,7 +17,9 @@ class ApplicationView(ListCreateAPIView):
     def get_queryset(self):
         return Application.objects.filter(user = self.request.user)
     
-    def perform_create(self, serializer):
+    def perform_create(self, serializer):  
+        if not self.request.user.profile.is_pro and self.request.user.application_set.count() >= FREE_TIER_APP_LIMIT:
+            raise PermissionDenied("Free tier is limited to 1 application. Upgrade to add more.") 
         application = serializer.save(user = self.request.user)
         documents = generate_document_checklist(country = application.country, purpose = application.purpose)
         for document in documents:
@@ -29,6 +34,8 @@ class ApplicationView(ListCreateAPIView):
                 application = application,
                 document = document_data
             )
+            
+            
         
 class ApplicationRetrieveView(RetrieveAPIView):
     serializer_class = ApplicationSerializer
@@ -47,6 +54,8 @@ class ChatAdvisorView(APIView):
     permission_classes = [IsAuthenticated]
     
     def post(self, request, pk):
+        if not self.request.user.profile.is_pro:
+            raise PermissionDenied("Chat with Advisor is a Pro feature. Upgrade to unlock it.")
         application = get_object_or_404(Application, user = self.request.user, pk = pk)
         response = get_advisor_answer(application,request.data["question"])
         return Response({"answer": response})

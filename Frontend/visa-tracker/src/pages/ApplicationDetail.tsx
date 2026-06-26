@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import api from '../api/axios'
+import { useProfile } from '../hooks/useProfile'
+import UpgradeModal from '../components/UpgradeModal'
 
 interface DocumentItem {
   name: string
@@ -12,6 +14,7 @@ interface ChecklistItem {
   id: number
   status: string
   document: DocumentItem
+  attachment: string | null
 }
 
 interface ApplicationItem {
@@ -26,12 +29,6 @@ const STATUS_CONFIG: Record<string, { label: string; bg: string; color: string }
   T: { label: 'Required', bg: '#eceef0', color: '#45464d' },
   P: { label: 'In Progress', bg: '#c9e6ff', color: '#004c6e' },
   D: { label: 'Completed', bg: '#71f8e4', color: '#005048' },
-}
-
-function nextStatus(current: string) {
-  if (current === 'T') return 'P'
-  if (current === 'P') return 'D'
-  return 'T'
 }
 
 function formatDate(dateStr: string) {
@@ -53,6 +50,8 @@ function ApplicationDetail() {
   const [guideText, setGuideText] = useState('')
   const [guideLoading, setGuideLoading] = useState(false)
   const [guideError, setGuideError] = useState('')
+  const { profile, upgrading, upgrade } = useProfile()
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
 
   useEffect(() => {
     const fetchApplication = async () => {
@@ -103,16 +102,6 @@ function ApplicationDetail() {
     }
   }
 
-  const handleCheckboxClick = (item: ChecklistItem) => {
-    // single click toggles directly between Done and To Do
-    updateStatus(item, item.status === 'D' ? 'T' : 'D')
-  }
-
-  const handleBadgeClick = (item: ChecklistItem) => {
-    // badge keeps the full 3-way cycle for finer control
-    updateStatus(item, nextStatus(item.status))
-  }
-
   const handleSendMessage = async () => {
     if (!chatInput.trim() || !application) return
     const question = chatInput
@@ -126,6 +115,22 @@ function ApplicationDetail() {
       setChatMessages((prev) => [...prev, { role: 'assistant', text: 'Sorry, I could not process that question.' }])
     } finally {
       setChatLoading(false)
+    }
+  }
+
+  const openChat = () => {
+    if (!profile?.isPro) {
+      setShowUpgradeModal(true)
+      return
+    }
+    setShowChat(true)
+  }
+
+  const handleUpgrade = async () => {
+    const success = await upgrade()
+    if (success) {
+      setShowUpgradeModal(false)
+      setShowChat(true)
     }
   }
 
@@ -177,6 +182,12 @@ function ApplicationDetail() {
                 onClick={() => navigate('/')}
               >
                 Dashboard
+              </a>
+              <a
+                className="font-body-lg text-body-lg text-on-surface-variant font-medium hover:text-primary transition-colors cursor-pointer"
+                onClick={() => navigate('/community')}
+              >
+                Community
               </a>
             </nav>
           </div>
@@ -232,14 +243,6 @@ function ApplicationDetail() {
                 >
                   <div className="flex justify-between items-start mb-stack-sm">
                     <div className="flex items-start gap-stack-sm">
-                      <button className="mt-1" onClick={() => handleCheckboxClick(item)} title="Mark as done / not done">
-                        <input
-                          checked={isDone}
-                          readOnly
-                          className="w-5 h-5 rounded border-outline-variant text-secondary focus:ring-0 cursor-pointer"
-                          type="checkbox"
-                        />
-                      </button>
                       <div>
                         <h3 className={`font-body-lg text-body-lg font-semibold text-primary ${isDone ? 'opacity-50 line-through' : ''}`}>
                           {item.document.name}
@@ -247,14 +250,17 @@ function ApplicationDetail() {
                         <p className="font-body-sm text-body-sm text-on-surface-variant">{item.document.description}</p>
                       </div>
                     </div>
-                    <button
-                      className="px-3 py-1 rounded-full font-status-label text-status-label whitespace-nowrap"
+                    <select
+                      className="px-3 py-1 rounded-full font-status-label text-status-label whitespace-nowrap border-none outline-none cursor-pointer appearance-none"
                       style={{ backgroundColor: config.bg, color: config.color }}
-                      onClick={() => handleBadgeClick(item)}
-                      title="Click to cycle status"
+                      value={item.status}
+                      onChange={(e) => updateStatus(item, e.target.value)}
+                      title="Change status"
                     >
-                      {config.label}
-                    </button>
+                      <option value="T">{STATUS_CONFIG.T.label}</option>
+                      <option value="P">{STATUS_CONFIG.P.label}</option>
+                      <option value="D">{STATUS_CONFIG.D.label}</option>
+                    </select>
                   </div>
                   <button
                     className="flex items-center gap-base text-secondary font-body-sm font-medium cursor-pointer"
@@ -285,7 +291,7 @@ function ApplicationDetail() {
               <div className="flex flex-col gap-stack-sm">
                 <button
                   className="flex items-center justify-center gap-base px-4 py-2 border border-primary text-primary rounded-lg font-medium hover:bg-primary hover:text-white transition-all"
-                  onClick={() => setShowChat(true)}
+                  onClick={openChat}
                 >
                   <span className="material-symbols-outlined text-[20px]">chat</span>
                   Chat with Advisor
@@ -422,6 +428,13 @@ function ApplicationDetail() {
           </div>
         </div>
       )}
+      <UpgradeModal
+        open={showUpgradeModal}
+        reason="Chat with Advisor is a Pro feature."
+        upgrading={upgrading}
+        onClose={() => setShowUpgradeModal(false)}
+        onUpgrade={handleUpgrade}
+      />
     </div>
   )
 }
