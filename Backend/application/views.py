@@ -1,6 +1,6 @@
-from rest_framework.generics import ListCreateAPIView, RetrieveAPIView, RetrieveUpdateAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveAPIView, RetrieveUpdateAPIView, ListAPIView
 from rest_framework.views import APIView, Response
-from .serializers import ApplicationSerializer, ChecklistSerializer
+from .serializers import ApplicationSerializer, ChecklistSerializer,MyDocumentSerializer
 from .models import Application, Document, ApplicationDocumentation
 from rest_framework.permissions import IsAuthenticated
 from .services import generate_document_checklist, get_advisor_answer, get_guide_answer
@@ -69,4 +69,11 @@ class GuideView(APIView):
         response = get_guide_answer(application.country, application.purpose)
         return Response({"guide": response})
             
-            
+class MyDocumentsView(ListAPIView):
+    serializer_class = MyDocumentSerializer
+    permission_classes = [IsAuthenticated]
+ 
+    def get_queryset(self):
+        return ApplicationDocumentation.objects.filter(
+            application__user = self.request.user
+        ).exclude(attachment = '').select_related('document', 'application')

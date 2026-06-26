@@ -22,3 +22,13 @@ class ChecklistSerializer(serializers.ModelSerializer):
     class Meta:
         model = ApplicationDocumentation
         fields = ["status", "attachment"]
+        
+class MyDocumentSerializer(serializers.ModelSerializer):
+    document = DocumentSerializer(read_only=True)
+    application_id = serializers.IntegerField(source='application.id', read_only=True)
+    country = serializers.CharField(source='application.country', read_only=True)
+    purpose = serializers.CharField(source='application.purpose', read_only=True)
+ 
+    class Meta:
+        model = ApplicationDocumentation
+        fields = ["id", "document", "application_id", "country", "purpose", "status", "attachment"]

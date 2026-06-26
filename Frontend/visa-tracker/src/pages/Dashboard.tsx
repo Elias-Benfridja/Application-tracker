@@ -140,9 +140,12 @@ function Dashboard() {
             <span className="text-primary font-bold border-b-2 border-primary pb-1 font-body-lg transition-colors">
               Dashboard
             </span>
-            <span className="text-on-surface-variant font-medium font-body-lg">
+            <Link
+              to="/documents"
+              className="text-on-surface-variant font-medium hover:text-primary transition-colors font-body-lg"
+            >
               Documents
-            </span>
+            </Link>
             <Link
               to="/deadlines"
               className="text-on-surface-variant font-medium hover:text-primary transition-colors font-body-lg"

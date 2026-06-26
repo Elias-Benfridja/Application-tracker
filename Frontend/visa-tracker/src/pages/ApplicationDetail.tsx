@@ -52,6 +52,7 @@ function ApplicationDetail() {
   const [guideError, setGuideError] = useState('')
   const { profile, upgrading, upgrade } = useProfile()
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+  const [uploadingIds, setUploadingIds] = useState<Set<number>>(new Set())
 
   useEffect(() => {
     const fetchApplication = async () => {
@@ -99,6 +100,38 @@ function ApplicationDetail() {
         ),
       })
       setError('Could not update status, please try again')
+    }
+  }
+
+  const uploadAttachment = async (item: ChecklistItem, file: File) => {
+    if (!application) return
+
+    setUploadingIds((prev) => new Set(prev).add(item.id))
+    setError('')
+
+    const formData = new FormData()
+    formData.append('attachment', file)
+
+    try {
+      const response = await api.patch(`/application/checklist/${item.id}/`, formData)
+      setApplication((prev) =>
+        prev
+          ? {
+              ...prev,
+              checklist: prev.checklist.map((c) =>
+                c.id === item.id ? { ...c, attachment: response.data.attachment } : c
+              ),
+            }
+          : prev
+      )
+    } catch {
+      setError('Could not upload file, please try again')
+    } finally {
+      setUploadingIds((prev) => {
+        const next = new Set(prev)
+        next.delete(item.id)
+        return next
+      })
     }
   }
 
@@ -189,6 +222,12 @@ function ApplicationDetail() {
               >
                 Community
               </a>
+              <a
+                className="font-body-lg text-body-lg text-on-surface-variant font-medium hover:text-primary transition-colors cursor-pointer"
+                onClick={() => navigate('/documents')}
+              >
+                Documents
+              </a>
             </nav>
           </div>
         </div>
@@ -276,6 +315,39 @@ function ApplicationDetail() {
                       {item.document.details}
                     </div>
                   )}
+
+                  <div className="flex items-center gap-stack-sm mt-stack-sm pt-stack-sm border-t border-outline-variant/30">
+                    <label className="flex items-center gap-base text-secondary font-body-sm font-medium cursor-pointer">
+                      <span className="material-symbols-outlined text-[18px]">upload_file</span>
+                      {uploadingIds.has(item.id)
+                        ? 'Uploading...'
+                        : item.attachment
+                        ? 'Replace file'
+                        : 'Upload file'}
+                      <input
+                        type="file"
+                        accept="image/*,.pdf"
+                        className="hidden"
+                        disabled={uploadingIds.has(item.id)}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (file) uploadAttachment(item, file)
+                          e.target.value = ''
+                        }}
+                      />
+                    </label>
+                    {item.attachment && (
+                      <a
+                        href={item.attachment}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-base text-on-surface-variant font-body-sm hover:text-primary"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">description</span>
+                        View uploaded file
+                      </a>
+                    )}
+                  </div>
                 </div>
               )
             })}

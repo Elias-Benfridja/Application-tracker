@@ -6,6 +6,7 @@ import ApplicationDetail from "./pages/ApplicationDetail";
 import Deadlines from "./pages/Deadlines";
 import Community from "./pages/Community";
 import CommunityQuestion from "./pages/CommunityQuestion";
+import MyDocuments from "./pages/MyDocuments";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -49,6 +50,14 @@ function App() {
           element={
             <ProtectedRoute>
               <CommunityQuestion />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/documents"
+          element={
+            <ProtectedRoute>
+              <MyDocuments />
             </ProtectedRoute>
           }
         />
