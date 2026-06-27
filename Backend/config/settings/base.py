@@ -77,3 +77,8 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(hours = 1),
     "REFRECH_TOKEN_LIFTIME": timedelta(days = 1)
 }
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "https://application-tracker-jet.vercel.app/"
+]
