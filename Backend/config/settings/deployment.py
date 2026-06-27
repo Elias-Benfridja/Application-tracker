@@ -3,7 +3,7 @@ import os
 import dj_database_url
 
 DEBUG = False
-ALLOWED_HOSTS = ['app-url']
+ALLOWED_HOSTS = ['application-tracker-production-3af2.up.railway.app']
 
 DATABASES = {
     'default': dj_database_url.config(
