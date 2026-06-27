@@ -10,6 +10,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 DATABASES = {
     'default': dj_database_url.config(
         default=os.environ.get('DATABASE_URL'),
-        engine='django.db.backends.postgresql'
+        engine='django.db.backends.postgresql',
+        conn_max_age=600,
     )
 }
