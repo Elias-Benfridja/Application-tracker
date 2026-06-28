@@ -277,7 +277,7 @@ function ApplicationDetail() {
       <main className="max-w-max-width-content mx-auto px-gutter py-stack-lg">
         {/* Application Header */}
         <section className="mb-stack-lg">
-          <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-container-padding flex flex-col md:flex-row justify-between items-start gap-stack-md">
+          <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-container-padding flex flex-col md:flex-row justify-between items-start md:items-center gap-stack-md">
             <div className="flex items-center gap-stack-md">
               <div className="w-16 h-16 bg-secondary-container/10 rounded-full flex items-center justify-center">
                 <span className="material-symbols-outlined text-secondary text-4xl">public</span>
