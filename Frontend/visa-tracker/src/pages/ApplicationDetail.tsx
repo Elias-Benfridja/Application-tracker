@@ -257,6 +257,12 @@ function ApplicationDetail() {
               >
                 Dashboard
               </a>
+              <a
+                className="font-body-lg text-body-lg text-on-surface-variant font-medium hover:text-primary transition-colors cursor-pointer"
+                onClick={() => navigate('/documents')}
+              >
+                Documents
+              </a>
               <Link
               to="/deadlines"
               className="text-on-surface-variant font-medium hover:text-primary transition-colors font-body-lg"
@@ -269,12 +275,7 @@ function ApplicationDetail() {
               >
                 Community
               </a>
-              <a
-                className="font-body-lg text-body-lg text-on-surface-variant font-medium hover:text-primary transition-colors cursor-pointer"
-                onClick={() => navigate('/documents')}
-              >
-                Documents
-              </a>
+              
             </nav>
           </div>
         </div>
