@@ -7,7 +7,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 DATABASES = {
     'default': {
-        'ENGINE': 'db_backends.iam_auth',
+        'ENGINE': 'config.db_backends.iam_auth',
         'NAME': 'postgres',
         'USER': 'postgres',
         'HOST': 'visatrack-db.cluster-cfsgq0imo1d8.eu-north-1.rds.amazonaws.com',
