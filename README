@@ -1,0 +1,171 @@
+# VisaTrack
+
+**AI-powered visa and document tracking for stress-free applications.**
+
+VisaTrack helps anyone navigating a visa application stay organized. Tell it your destination country and purpose — it automatically generates your required document checklist using AI, lets you track progress, upload files, and get personalized guidance through an AI advisor.
+
+Built for the [H0 — Hack the Zero Stack with Vercel v0 & AWS Databases](https://h01.devpost.com) hackathon.
+
+---
+
+## Live Demo
+
+- **Frontend:** https://application-tracker-jet.vercel.app
+- **Backend API:** https://application-tracker-production-3af2.up.railway.app
+
+---
+
+## The Problem
+
+Visa applications are overwhelming. Dozens of documents, strict deadlines, country-specific requirements — and no clear way to know where you stand. People miss appointments, forget requirements, and get rejected over small paperwork mistakes.
+
+VisaTrack fixes that by combining AI-generated checklists with a clean, simple tracker so applicants always know exactly what they need and where they are in the process.
+
+---
+
+## Features
+
+**Core**
+- AI-generated document checklist based on destination country and visa purpose
+- Per-document status tracking (Required → In Progress → Completed)
+- File upload and management for each document
+- Progress bar showing overall application completion
+
+**AI Features**
+- Visa Guide — AI-generated step-by-step guide tailored to your country and visa type
+- Chat with Advisor — conversational AI that answers questions about your specific application (Pro)
+
+**Community**
+- Share tips and experiences with other applicants
+
+**Pro Tier**
+- Unlimited applications (free tier: 1 application)
+- Chat with Advisor access
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React, TypeScript, Tailwind CSS, Vercel |
+| Backend | Django, Django REST Framework, Python |
+| Database | Amazon Aurora PostgreSQL (Serverless v2) |
+| Auth | JWT via SimpleJWT |
+| AI | Google Gemini 2.5 Flash |
+| Hosting | Vercel (frontend) · Railway (backend) |
+| Cloud | AWS (Aurora PostgreSQL, IAM Authentication) |
+
+---
+
+## AWS Database
+
+VisaTrack uses **Amazon Aurora PostgreSQL (Compatible with PostgreSQL 17.7)** deployed as a serverless v2 cluster in `eu-north-1`.
+
+- **Cluster:** `visatrack-db`
+- **Engine:** Aurora PostgreSQL 17.7
+- **Type:** Serverless v2 (0–4 ACUs, auto-scaling)
+- **Auth:** IAM Database Authentication via boto3
+- **Region:** eu-north-1 (Stockholm)
+
+Aurora was chosen for its native PostgreSQL compatibility (works out of the box with Django ORM), serverless auto-scaling, and IAM-based authentication which eliminates static credentials.
+
+---
+
+## Architecture
+
+```
+┌─────────────────┐         ┌──────────────────────┐
+│   React + TS    │  HTTPS  │   Django + DRF       │
+│   Vercel        │────────▶│   Railway            │
+└─────────────────┘         └──────────┬───────────┘
+                                       │
+                          ┌────────────┴────────────┐
+                          │                         │
+               ┌──────────▼──────────┐   ┌─────────▼────────┐
+               │  Aurora PostgreSQL  │   │  Gemini 2.5 Flash │
+               │  AWS (eu-north-1)  │   │  Google AI        │
+               │  IAM Auth + boto3  │   └──────────────────┘
+               └────────────────────┘
+```
+
+---
+
+## Local Development
+
+### Prerequisites
+- Python 3.12+
+- Node.js 18+
+- PostgreSQL (local) or SQLite for dev
+
+### Backend Setup
+
+```bash
+cd Backend
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+Create a `.env` file:
+```env
+SECRET_KEY=your-secret-key
+GEMINI_API_KEY=your-gemini-api-key
+DJANGO_SETTINGS_MODULE=config.settings.development
+```
+
+Run migrations and start:
+```bash
+python manage.py migrate
+python manage.py runserver
+```
+
+### Frontend Setup
+
+```bash
+cd Frontend
+npm install
+npm run dev
+```
+
+---
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET/POST | `/application/` | List or create applications |
+| GET/DELETE | `/application/{id}/` | Retrieve or delete an application |
+| GET/PATCH | `/application/checklist/{id}/` | Update checklist item status or attachment |
+| POST | `/application/{id}/chat/` | Ask the AI advisor a question (Pro) |
+| GET | `/application/{id}/guide/` | Get AI visa guide |
+| GET | `/application/documents/` | List all uploaded documents |
+| POST | `/users/register/` | Register a new user |
+| POST | `/users/token/` | Obtain JWT token |
+| POST | `/users/token/refresh/` | Refresh JWT token |
+
+---
+
+## Environment Variables
+
+### Backend (Railway)
+| Variable | Description |
+|---|---|
+| `SECRET_KEY` | Django secret key |
+| `GEMINI_API_KEY` | Google Gemini API key |
+| `DJANGO_SETTINGS_MODULE` | `config.settings.deployment` |
+| `AWS_ACCESS_KEY_ID` | AWS IAM user access key |
+| `AWS_SECRET_ACCESS_KEY` | AWS IAM user secret key |
+| `AWS_DEFAULT_REGION` | `eu-north-1` |
+
+---
+
+## Team
+
+Built solo by **Elias** for the H0 Hackathon (June 2026).
+
+---
+
+## License
+
+MIT
