@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import api from '../api/axios'
 import { useProfile } from '../hooks/useProfile'
 import UpgradeModal from '../components/UpgradeModal'
@@ -257,6 +257,12 @@ function ApplicationDetail() {
               >
                 Dashboard
               </a>
+              <Link
+              to="/deadlines"
+              className="text-on-surface-variant font-medium hover:text-primary transition-colors font-body-lg"
+            >
+              Deadlines
+            </Link>
               <a
                 className="font-body-lg text-body-lg text-on-surface-variant font-medium hover:text-primary transition-colors cursor-pointer"
                 onClick={() => navigate('/community')}
