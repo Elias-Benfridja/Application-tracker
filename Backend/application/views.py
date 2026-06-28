@@ -1,4 +1,4 @@
-from rest_framework.generics import ListCreateAPIView, RetrieveAPIView, RetrieveUpdateAPIView, ListAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveDestroyAPIView, RetrieveUpdateAPIView, ListAPIView
 from rest_framework.views import APIView, Response
 from .serializers import ApplicationSerializer, ChecklistSerializer,MyDocumentSerializer
 from .models import Application, Document, ApplicationDocumentation
@@ -37,7 +37,7 @@ class ApplicationView(ListCreateAPIView):
             
             
         
-class ApplicationRetrieveView(RetrieveAPIView):
+class ApplicationRetrieveView(RetrieveDestroyAPIView):
     serializer_class = ApplicationSerializer
     permission_classes = [IsAuthenticated]
     def get_queryset(self):

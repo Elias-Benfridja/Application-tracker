@@ -277,7 +277,7 @@ function ApplicationDetail() {
       <main className="max-w-max-width-content mx-auto px-gutter py-stack-lg">
         {/* Application Header */}
         <section className="mb-stack-lg">
-          <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-container-padding flex flex-col md:flex-row justify-between items-start md:items-center gap-stack-md">
+          <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-container-padding flex flex-col md:flex-row justify-between items-start gap-stack-md">
             <div className="flex items-center gap-stack-md">
               <div className="w-16 h-16 bg-secondary-container/10 rounded-full flex items-center justify-center">
                 <span className="material-symbols-outlined text-secondary text-4xl">public</span>
@@ -287,26 +287,28 @@ function ApplicationDetail() {
                 <p className="font-body-lg text-on-surface-variant">Purpose: {application.purpose}</p>
               </div>
             </div>
-            <div className="flex flex-col items-end gap-base p-5">
+            <div className="flex flex-col items-end gap-stack-sm w-full md:w-auto">
               <button
-                className="flex items-center gap-base px-3 py-1.5 text-error border border-error/30 rounded-lg font-body-sm font-medium hover:bg-error/10 transition-all"
+                className="flex items-center gap-base px-4 py-2 text-error border border-error rounded-lg font-body-sm font-medium hover:bg-error hover:text-white transition-all"
                 onClick={() => setConfirmDelete(true)}
               >
                 <span className="material-symbols-outlined text-[18px]">delete</span>
                 Delete Application
               </button>
-              <div className="flex items-center gap-base text-error">
-                <span className="material-symbols-outlined text-[20px]">alarm</span>
-                <span className="font-label-caps text-label-caps uppercase tracking-wider">
-                  Deadline: {formatDate(application.deadline)}
+              <div className="flex flex-col items-end gap-base mt-stack-sm">
+                <div className="flex items-center gap-base text-error">
+                  <span className="material-symbols-outlined text-[20px]">alarm</span>
+                  <span className="font-label-caps text-label-caps uppercase tracking-wider">
+                    Deadline: {formatDate(application.deadline)}
+                  </span>
+                </div>
+                <div className="w-48 h-2 bg-surface-container rounded-full overflow-hidden">
+                  <div className="h-full bg-secondary transition-all duration-700" style={{ width: `${percent}%` }}></div>
+                </div>
+                <span className="font-body-sm text-body-sm text-on-surface-variant">
+                  {done} of {total} tasks completed
                 </span>
               </div>
-              <div className="w-48 h-2 bg-surface-container rounded-full overflow-hidden">
-                <div className="h-full bg-secondary transition-all duration-700" style={{ width: `${percent}%` }}></div>
-              </div>
-              <span className="font-body-sm text-body-sm text-on-surface-variant">
-                {done} of {total} tasks completed
-              </span>
             </div>
           </div>
         </section>
