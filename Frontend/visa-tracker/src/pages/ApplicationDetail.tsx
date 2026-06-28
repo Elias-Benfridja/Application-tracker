@@ -295,7 +295,7 @@ function ApplicationDetail() {
                 <span className="material-symbols-outlined text-[18px]">delete</span>
                 Delete Application
               </button>
-              <div className="flex flex-col items-end gap-base mt-stack-sm">
+              <div className="flex flex-col items-end gap-base mt-stack-sm p-5">
                 <div className="flex items-center gap-base text-error">
                   <span className="material-symbols-outlined text-[20px]">alarm</span>
                   <span className="font-label-caps text-label-caps uppercase tracking-wider">
