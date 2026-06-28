@@ -236,7 +236,7 @@ function Deadlines() {
         <div className="flex flex-col md:flex-row justify-between items-center py-stack-lg px-gutter max-w-max-width-content mx-auto">
           <div className="mb-4 md:mb-0">
             <div className="text-headline-md font-headline-md font-bold text-primary mb-2">VisaTrack</div>
-            <p className="text-on-surface-variant font-body-sm text-body-sm">© 2025 VisaTrack. All rights reserved.</p>
+            <p className="text-on-surface-variant font-body-sm text-body-sm">© 2026 VisaTrack. All rights reserved.</p>
           </div>
           <div className="flex flex-wrap justify-center gap-x-8 gap-y-2 text-on-surface-variant font-body-sm text-body-sm">
             <a className="cursor-pointer hover:underline">Privacy Policy</a>
