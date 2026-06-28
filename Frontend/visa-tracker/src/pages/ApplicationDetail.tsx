@@ -287,7 +287,7 @@ function ApplicationDetail() {
                 <p className="font-body-lg text-on-surface-variant">Purpose: {application.purpose}</p>
               </div>
             </div>
-            <div className="flex flex-col items-end gap-stack-sm w-full md:w-auto">
+            <div className="flex flex-col items-end gap-stack-sm w-full md:w-auto p-5">
               <button
                 className="flex items-center gap-base px-4 py-2 text-error border border-error rounded-lg font-body-sm font-medium hover:bg-error hover:text-white transition-all"
                 onClick={() => setConfirmDelete(true)}
@@ -295,7 +295,7 @@ function ApplicationDetail() {
                 <span className="material-symbols-outlined text-[18px]">delete</span>
                 Delete Application
               </button>
-              <div className="flex flex-col items-end gap-base mt-stack-sm p-5">
+              <div className="flex flex-col items-end gap-base mt-stack-sm">
                 <div className="flex items-center gap-base text-error">
                   <span className="material-symbols-outlined text-[20px]">alarm</span>
                   <span className="font-label-caps text-label-caps uppercase tracking-wider">
