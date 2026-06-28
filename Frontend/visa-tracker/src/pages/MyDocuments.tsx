@@ -1,62 +1,65 @@
-import { useEffect, useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import api from '../api/axios'
+import { useEffect, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import api from "../api/axios";
 
 interface MyDocumentItem {
-  id: number
-  document: { name: string; description: string; details: string }
-  application_id: number
-  country: string
-  purpose: string
-  status: string
-  attachment: string
+  id: number;
+  document: { name: string; description: string; details: string };
+  application_id: number;
+  country: string;
+  purpose: string;
+  status: string;
+  attachment: string;
 }
 
 const STATUS_LABEL: Record<string, string> = {
-  T: 'Required',
-  P: 'In Progress',
-  D: 'Completed',
-}
+  T: "Required",
+  P: "In Progress",
+  D: "Completed",
+};
 
 function fileNameFromUrl(url: string) {
   try {
-    return decodeURIComponent(url.split('/').pop() ?? url)
+    return decodeURIComponent(url.split("/").pop() ?? url);
   } catch {
-    return url
+    return url;
   }
 }
 
 function isImage(url: string) {
-  return /\.(png|jpe?g)$/i.test(url)
+  return /\.(png|jpe?g)$/i.test(url);
 }
 
 function MyDocuments() {
-  const navigate = useNavigate()
-  const [items, setItems] = useState<MyDocumentItem[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+  const navigate = useNavigate();
+  const [items, setItems] = useState<MyDocumentItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchDocuments = async () => {
-      setLoading(true)
+      setLoading(true);
       try {
-        const response = await api.get('/application/documents/')
-        setItems(response.data)
+        const response = await api.get("/application/documents/");
+        setItems(response.data);
       } catch {
-        setError('Could not load your documents')
+        setError("Could not load your documents");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
-    fetchDocuments()
-  }, [])
+    };
+    fetchDocuments();
+  }, []);
 
   // group flat list by application so it's easy to scan
-  const grouped = items.reduce<Record<number, MyDocumentItem[]>>((acc, item) => {
-    acc[item.application_id] = acc[item.application_id] || []
-    acc[item.application_id].push(item)
-    return acc
-  }, {})
+  const grouped = items.reduce<Record<number, MyDocumentItem[]>>(
+    (acc, item) => {
+      acc[item.application_id] = acc[item.application_id] || [];
+      acc[item.application_id].push(item);
+      return acc;
+    },
+    {},
+  );
 
   return (
     <div className="bg-background text-on-background font-body-lg min-h-screen flex flex-col">
@@ -76,6 +79,12 @@ function MyDocuments() {
               Documents
             </span>
             <Link
+              to="/deadlines"
+              className="text-on-surface-variant font-medium hover:text-primary transition-colors font-body-lg"
+            >
+              Deadlines
+            </Link>
+            <Link
               to="/community"
               className="text-on-surface-variant font-medium hover:text-primary transition-colors font-body-lg"
             >
@@ -87,7 +96,9 @@ function MyDocuments() {
 
       <main className="grow max-w-max-width-content w-full mx-auto px-gutter py-stack-lg">
         <div className="mb-stack-lg">
-          <h1 className="font-headline-lg text-headline-lg text-primary mb-1">My Documents</h1>
+          <h1 className="font-headline-lg text-headline-lg text-primary mb-1">
+            My Documents
+          </h1>
           <p className="text-on-surface-variant font-body-lg">
             Every file you've uploaded, across all your applications.
           </p>
@@ -113,7 +124,9 @@ function MyDocuments() {
                   className="flex items-center gap-base text-secondary font-body-sm font-medium mb-stack-sm cursor-pointer"
                   onClick={() => navigate(`/application/${appId}`)}
                 >
-                  <span className="material-symbols-outlined text-[18px]">folder_open</span>
+                  <span className="material-symbols-outlined text-[18px]">
+                    folder_open
+                  </span>
                   {docs[0].country} · {docs[0].purpose}
                 </button>
                 <div className="flex flex-col gap-stack-sm">
@@ -127,7 +140,7 @@ function MyDocuments() {
                     >
                       <div className="flex items-center gap-stack-sm">
                         <span className="material-symbols-outlined text-secondary">
-                          {isImage(item.attachment) ? 'image' : 'description'}
+                          {isImage(item.attachment) ? "image" : "description"}
                         </span>
                         <div>
                           <p className="font-body-lg text-body-lg font-semibold text-primary">
@@ -150,7 +163,7 @@ function MyDocuments() {
         )}
       </main>
     </div>
-  )
+  );
 }
 
-export default MyDocuments
+export default MyDocuments;
