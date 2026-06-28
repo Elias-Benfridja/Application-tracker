@@ -140,9 +140,14 @@ npm run dev
 | POST | `/application/{id}/chat/` | Ask the AI advisor a question (Pro) |
 | GET | `/application/{id}/guide/` | Get AI visa guide |
 | GET | `/application/documents/` | List all uploaded documents |
-| POST | `/users/register/` | Register a new user |
-| POST | `/users/token/` | Obtain JWT token |
-| POST | `/users/token/refresh/` | Refresh JWT token |
+| POST | `/user/register/` | Register a new user |
+| GET | `/user/me/` | Get current user profile |
+| PATCH | `/user/upgrade/` | Upgrade to Pro |
+| GET/POST | `/community/` | List or create questions |
+| GET | `/community/{id}/` | Retrieve a question |
+| POST | `/community/{id}/comments/` | Add a comment |
+| POST | `/api/token/` | Obtain JWT token |
+| POST | `/api/token/refresh/` | Refresh JWT token |
 
 ---
 
