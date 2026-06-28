@@ -53,6 +53,9 @@ function ApplicationDetail() {
   const { profile, upgrading, upgrade } = useProfile()
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   const [uploadingIds, setUploadingIds] = useState<Set<number>>(new Set())
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [deletingApp, setDeletingApp] = useState(false)
+  const [deletingAttachmentIds, setDeletingAttachmentIds] = useState<Set<number>>(new Set())
 
   useEffect(() => {
     const fetchApplication = async () => {
@@ -128,6 +131,44 @@ function ApplicationDetail() {
       setError('Could not upload file, please try again')
     } finally {
       setUploadingIds((prev) => {
+        const next = new Set(prev)
+        next.delete(item.id)
+        return next
+      })
+    }
+  }
+
+  const deleteApplication = async () => {
+    setDeletingApp(true)
+    try {
+      await api.delete(`/application/${id}/`)
+      navigate('/')
+    } catch {
+      setError('Could not delete application, please try again')
+      setDeletingApp(false)
+      setConfirmDelete(false)
+    }
+  }
+
+  const deleteAttachment = async (item: ChecklistItem) => {
+    if (!application) return
+    setDeletingAttachmentIds((prev) => new Set(prev).add(item.id))
+    try {
+      await api.patch(`/application/checklist/${item.id}/`, { attachment: null })
+      setApplication((prev) =>
+        prev
+          ? {
+              ...prev,
+              checklist: prev.checklist.map((c) =>
+                c.id === item.id ? { ...c, attachment: null } : c
+              ),
+            }
+          : prev
+      )
+    } catch {
+      setError('Could not delete file, please try again')
+    } finally {
+      setDeletingAttachmentIds((prev) => {
         const next = new Set(prev)
         next.delete(item.id)
         return next
@@ -247,6 +288,13 @@ function ApplicationDetail() {
               </div>
             </div>
             <div className="flex flex-col items-end gap-base p-5">
+              <button
+                className="flex items-center gap-base px-3 py-1.5 text-error border border-error/30 rounded-lg font-body-sm font-medium hover:bg-error/10 transition-all"
+                onClick={() => setConfirmDelete(true)}
+              >
+                <span className="material-symbols-outlined text-[18px]">delete</span>
+                Delete Application
+              </button>
               <div className="flex items-center gap-base text-error">
                 <span className="material-symbols-outlined text-[20px]">alarm</span>
                 <span className="font-label-caps text-label-caps uppercase tracking-wider">
@@ -337,15 +385,25 @@ function ApplicationDetail() {
                       />
                     </label>
                     {item.attachment && (
-                      <a
-                        href={item.attachment}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-base text-on-surface-variant font-body-sm hover:text-primary"
-                      >
-                        <span className="material-symbols-outlined text-[18px]">description</span>
-                        View uploaded file
-                      </a>
+                      <>
+                        <a
+                          href={item.attachment}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-base text-on-surface-variant font-body-sm hover:text-primary"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">description</span>
+                          View uploaded file
+                        </a>
+                        <button
+                          className="flex items-center gap-base text-error font-body-sm hover:opacity-70 disabled:opacity-40"
+                          disabled={deletingAttachmentIds.has(item.id)}
+                          onClick={() => deleteAttachment(item)}
+                        >
+                          <span className="material-symbols-outlined text-[18px]">delete</span>
+                          {deletingAttachmentIds.has(item.id) ? 'Deleting...' : 'Delete file'}
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>
@@ -393,7 +451,7 @@ function ApplicationDetail() {
             <a className="font-body-sm text-body-sm text-on-surface-variant hover:underline transition-colors cursor-pointer">Contact Us</a>
             <a className="font-body-sm text-body-sm text-on-surface-variant hover:underline transition-colors cursor-pointer">Help Center</a>
           </div>
-          <p className="font-body-sm text-body-sm text-on-surface-variant">© 2024 VisaTrack. All rights reserved.</p>
+          <p className="font-body-sm text-body-sm text-on-surface-variant">© 2026 VisaTrack. All rights reserved.</p>
         </div>
       </footer>
 
@@ -496,6 +554,35 @@ function ApplicationDetail() {
                     {paragraph}
                   </p>
                 ))}
+            </div>
+          </div>
+        </div>
+      )}
+      {confirmDelete && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-100 flex items-center justify-center p-gutter">
+          <div className="bg-surface-container-lowest rounded-xl shadow-2xl p-6 w-full max-w-sm flex flex-col gap-stack-md">
+            <div className="flex items-center gap-stack-sm text-error">
+              <span className="material-symbols-outlined">warning</span>
+              <h2 className="font-headline-md text-headline-md">Delete Application?</h2>
+            </div>
+            <p className="font-body-sm text-on-surface-variant">
+              This will permanently delete your <strong>{application.country} {application.purpose}</strong> application and all its documents. This cannot be undone.
+            </p>
+            <div className="flex gap-stack-sm justify-end">
+              <button
+                className="px-4 py-2 rounded-lg border border-outline-variant text-on-surface font-body-sm hover:bg-surface-container transition-all"
+                onClick={() => setConfirmDelete(false)}
+                disabled={deletingApp}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 rounded-lg bg-error text-white font-body-sm hover:opacity-90 disabled:opacity-50 transition-all"
+                onClick={deleteApplication}
+                disabled={deletingApp}
+              >
+                {deletingApp ? 'Deleting...' : 'Delete'}
+              </button>
             </div>
           </div>
         </div>

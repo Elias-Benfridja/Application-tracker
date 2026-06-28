@@ -314,7 +314,7 @@ function Dashboard() {
               VisaTrack
             </div>
             <p className="text-on-surface-variant font-body-sm">
-              © 2024 VisaTrack. All rights reserved.
+              © 2025 VisaTrack. All rights reserved.
             </p>
           </div>
           <div className="flex gap-stack-lg">
