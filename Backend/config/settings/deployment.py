@@ -2,7 +2,7 @@ from .base import *
 import os
 
 DEBUG = False
-ALLOWED_HOSTS = [os.environ.get('RENDER_EXTERNAL_HOSTNAME', 'localhost')]
+ALLOWED_HOSTS = ['application-tracker-8h92.onrender.com']
 CORS_ALLOW_ALL_ORIGINS = True
 
 DATABASES = {
