@@ -2,7 +2,7 @@ from .base import *
 import os
 
 DEBUG = False
-ALLOWED_HOSTS = ['application-tracker-production-3af2.up.railway.app']
+ALLOWED_HOSTS = [os.environ.get('RENDER_EXTERNAL_HOSTNAME', 'localhost')]
 CORS_ALLOW_ALL_ORIGINS = True
 
 DATABASES = {

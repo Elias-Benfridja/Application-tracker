@@ -82,3 +82,5 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "https://application-tracker-jet.vercel.app"
 ]
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
