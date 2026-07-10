@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "application-tracker-8h92.onrender.com";
+const BASE_URL = "https://application-tracker-8h92.onrender.com";
 
 const api = axios.create({
     baseURL: BASE_URL,
